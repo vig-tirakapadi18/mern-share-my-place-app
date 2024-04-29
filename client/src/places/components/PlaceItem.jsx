@@ -1,14 +1,25 @@
 /* eslint-disable react/prop-types */
-import { Fragment, useState } from "react";
+import { Fragment, useContext, useState } from "react";
 import Button from "../../shared/components/FormElements/Button";
 import "./PlaceItem.css";
 import Modal from "../../shared/components/UI/Modal";
 import Map from "../../shared/components/UI/Map";
+import { AuthContext } from "../../shared/context/auth-context";
 
 const PlaceItem = (props) => {
     const [showMap, setShowMap] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const authCtx = useContext(AuthContext);
 
     const toggleModalHandler = () => setShowMap((prevState) => !prevState);
+
+    const toggleConfirmModalHandler = () =>
+        setShowConfirmModal((prevState) => !prevState);
+
+    const confirmDeleteHandler = () => {
+        setShowConfirmModal((prevState) => !prevState);
+        console.log("OKAY WAIT DELETING...");
+    };
 
     return (
         <Fragment>
@@ -24,7 +35,33 @@ const PlaceItem = (props) => {
                         center={props.coordinates}
                         zoom={16}
                     />
+                    {/* <h1>This is MAP!</h1> */}
                 </div>
+            </Modal>
+
+            <Modal
+                showModal={showConfirmModal}
+                onCancel={toggleConfirmModalHandler}
+                header="Are you sure?"
+                footerClass="place-item-modal-actions"
+                footer={
+                    <Fragment>
+                        <Button
+                            inverse
+                            onClick={toggleConfirmModalHandler}>
+                            CANCEL
+                        </Button>
+                        <Button
+                            danger
+                            onClick={confirmDeleteHandler}>
+                            DELETE
+                        </Button>
+                    </Fragment>
+                }>
+                <p>
+                    Are you sure you want to delete this place? Please note that
+                    it can&apos;t be undone later.
+                </p>
             </Modal>
 
             <li className="place-item">
@@ -47,8 +84,16 @@ const PlaceItem = (props) => {
                         onClick={toggleModalHandler}>
                         VIEW ON MAP
                     </Button>
-                    <Button to={`/places/${props.id}`}>EDIT</Button>
-                    <Button danger>DELETE</Button>
+                    {authCtx.isLoggedIn && (
+                        <Fragment>
+                            <Button to={`/places/${props.id}`}>EDIT</Button>
+                            <Button
+                                danger
+                                onClick={toggleConfirmModalHandler}>
+                                DELETE
+                            </Button>
+                        </Fragment>
+                    )}
                 </div>
             </li>
         </Fragment>

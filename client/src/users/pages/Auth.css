@@ -1,15 +1,18 @@
-.authentication-header {
+.auth-header {
     color: white;
     text-align: center;
 }
 
-.authentication {
+.auth {
     width: 90%;
-    max-width: 25rem;
+    max-width: 30rem;
     margin: 7rem auto;
-    text-align: center;
+    background-color: rgba(0, 0, 0, 0.85);
+    padding: 1rem;
+    border-radius: 6px;
+    box-shadow: 0 10px 20px 5px rgba(0, 0, 0, 0.35);
 }
 
-.authentication form {
+.auth form {
     margin-bottom: 1rem;
 }

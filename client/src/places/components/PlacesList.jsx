@@ -1,3 +1,4 @@
+import Button from "../../shared/components/FormElements/Button";
 import Card from "../../shared/components/UI/Card";
 import PlaceItem from "./PlaceItem";
 
@@ -9,8 +10,8 @@ const PlacesList = (props) => {
         return (
             <div className="place-list center">
                 <Card>
-                    <h2>No places found. Mayne create one?</h2>
-                    <button>Share Place</button>
+                    <h2>No places found. Maybe create one?</h2>
+                    <Button to="/places/new">Share Place</Button>
                 </Card>
             </div>
         );

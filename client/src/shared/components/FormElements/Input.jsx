@@ -4,8 +4,6 @@ import { useEffect, useReducer } from "react";
 import "./Input.css";
 import { validate } from "../util/validator";
 
-const initialInputState = { value: "", isValid: false, isTouched: false };
-
 const inputReducer = (state, action) => {
     if (action.type === "CHANGE") {
         return {
@@ -26,6 +24,12 @@ const inputReducer = (state, action) => {
 };
 
 const Input = (props) => {
+    const initialInputState = {
+        value: props.value || "",
+        isValid: props.isValid || false,
+        isTouched: false,
+    };
+
     const [currentInputState, dispatchAction] = useReducer(
         inputReducer,
         initialInputState
@@ -80,7 +84,9 @@ const Input = (props) => {
             <label htmlFor={props.id}>{props.label}</label>
             {element}
 
-            {!currentInputState.isValid && <p>{props.errorText}</p>}
+            {!currentInputState.isValid && currentInputState.isTouched && (
+                <p>{props.errorText}</p>
+            )}
         </div>
     );
 };

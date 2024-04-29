@@ -1,0 +1,9 @@
+.message {
+    background-color: rgba(0, 0, 0, 0.85);
+    max-width: 30rem;
+    margin: 1rem auto;
+    color: red;
+    padding: 1rem;
+    border-radius: 6px;
+    box-shadow: 0 10px 20px 5px rgba(0, 0, 0, 0.35);
+}
