@@ -1,5 +1,8 @@
 const { v4 } = require('uuid');
+const { validationResult } = require("express-validator");
+
 const HttpError = require('../models/http-error');
+const getCoordinatesForAddress = require('../util/location');
 
 let DUMMY_PLACES = [
     {
@@ -31,12 +34,12 @@ exports.getPlacebyId = (req, res, next) => {
     res.json({ success: true, place: foundPlace });
 };
 
-exports.getPlaceByUserId = (req, res, next) => {
+exports.getPlacesByUserId = (req, res, next) => {
     const userId = req.params.userId;
 
-    const foundPlace = DUMMY_PLACES.find(user => user.creator === userId);
+    const foundPlaces = DUMMY_PLACES.filter(user => user.creator === userId);
 
-    if (!foundUser) {
+    if (!foundPlaces || foundPlaces.length === 0) {
         // const error = new Error("User not found with the given ID.");
         // error.statusCode = 404;
         // throw error;
@@ -44,11 +47,25 @@ exports.getPlaceByUserId = (req, res, next) => {
         throw new HttpError("User not found with the given ID.", 404);
     }
 
-    res.json({ success: true, user: foundPlace });
+    res.json({ success: true, user: foundPlaces });
 };
 
-exports.createPlace = (req, res) => {
-    const { title, description, coordinates, address, creator } = req.body;
+exports.createPlace = async (req, res) => {
+    const validationErrors = validationResult(req);
+
+    if (!validationErrors.isEmpty()) {
+        return next(new HttpError("Invalid inputs, please provide a valid inputs!", 422));
+    }
+
+    const { title, description, address, creator } = req.body;
+
+    let coordinates;
+
+    try {
+        coordinates = await getCoordinatesForAddress(address);
+    } catch (error) {
+        return next(error);
+    }
 
     const createdPlace = {
         id: v4(),   // Unique ID
@@ -65,6 +82,12 @@ exports.createPlace = (req, res) => {
 };
 
 exports.updatePlace = (req, res, next) => {
+    const validationErrors = validationResult(req);
+
+    if (!validationErrors.isEmpty()) {
+        throw new HttpError("Invalid inputs, please provide a valid inputs!", 422);
+    }
+
     const { title, description } = req.body;
     const placeId = req.params.placeId;
 
@@ -92,6 +115,10 @@ exports.updatePlace = (req, res, next) => {
 
 exports.deletePlace = (req, res, next) => {
     const placeId = req.params.placeId;
+
+    if (!DUMMY_PLACES.find(place => place.id === placeId)) {
+        throw new HttpError("Couldn't find a place!", 404);
+    }
 
     DUMMY_PLACES = DUMMY_PLACES.filter(place => place.id !== placeId);
 
