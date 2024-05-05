@@ -1,24 +1,7 @@
-const { v4 } = require("uuid");
 const { validationResult } = require('express-validator');
 const User = require("../models/user.model");
 
 const HttpError = require('../models/http-error');
-
-const DUMMY_USERS = [
-    {
-        id: "u1",
-        name: "Vig",
-        email: "test@test.com",
-        password: "test123456"
-
-    },
-    {
-        id: "u2",
-        name: "Vis",
-        email: "hello@test.com",
-        password: "hello123456"
-    }
-];
 
 exports.getAllUsers = async (req, res, next) => {
     let users;
@@ -44,6 +27,7 @@ exports.signUpUser = async (req, res, next) => {
     try {
         existingUser = await User.findOne({ email });
     } catch (error) {
+        console.log(error);
         return next(new HttpError("Sign up failed, please try again later!", 500));
     }
 
@@ -54,18 +38,19 @@ exports.signUpUser = async (req, res, next) => {
     const createdUser = new User({
         name,
         email,
-        password,
         image: "https://i.pinimg.com/236x/83/75/59/837559d3a670cdd887e58de85c4a73e1.jpg",
-        places: []
+        password,
+        places
     });
 
     try {
         await createdUser.save();
     } catch (error) {
+        console.log(error);
         return next(new HttpError("Sign up failed, please try again later!", 500));
     }
 
-    res.status(201).json({ user: createdUser.toObject({ getters: true }) });
+    res.status(201).json({ success: true, user: createdUser.toObject({ getters: true }) });
 };
 
 exports.loginUser = async (req, res, next) => {

@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { Fragment, useContext, useState } from "react";
 import Button from "../../shared/components/FormElements/Button";
 import Input from "../../shared/components/FormElements/Input";
 import Card from "../../shared/components/UI/Card";
@@ -11,6 +11,8 @@ import { useForm } from "../../shared/hooks/form-hook";
 
 import "./Auth.css";
 import { AuthContext } from "../../shared/context/auth-context";
+import LoadingPulse from "../../shared/components/UI/LoadingPulse";
+import ErrorModal from "../../shared/components/UI/ErrorModal";
 
 const initialAuthFormState = {
     email: { value: "", isValid: false },
@@ -19,6 +21,8 @@ const initialAuthFormState = {
 
 const Auth = () => {
     const [isLoginMode, setIsLoginMode] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState();
     const [currentFormState, inputHandler, setFormData] = useForm(
         initialAuthFormState,
         false
@@ -26,10 +30,77 @@ const Auth = () => {
 
     const authCtx = useContext(AuthContext);
 
-    const authFormSubmitHandler = (event) => {
+    const authFormSubmitHandler = async (event) => {
         event.preventDefault();
-        console.log(currentFormState.inputs);
-        authCtx.login();
+        setIsLoading(true);
+
+        if (isLoginMode) {
+            try {
+                const response = await fetch(
+                    "http://localhost:5000/api/users/login",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            email: currentFormState.inputs.email.value,
+                            password: currentFormState.inputs.password.value,
+                        }),
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(responseData.message);
+                }
+
+                const responseData = await response.json();
+                console.log(responseData);
+                setIsLoading(false);
+                authCtx.login();
+            } catch (error) {
+                setError(
+                    error.message ||
+                        "Something went wrong, please try again later!"
+                );
+                setIsLoading(false);
+            }
+        } else {
+            try {
+                const response = await fetch(
+                    "http://localhost:5000/api/users/sign-up",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            name: currentFormState.inputs.name.value,
+                            email: currentFormState.inputs.email.value,
+                            password: currentFormState.inputs.password.value,
+                            image: "",
+                            places: [],
+                        }),
+                    }
+                );
+
+                const responseData = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(responseData.message);
+                }
+
+                console.log(responseData);
+                setIsLoading(false);
+                authCtx.login();
+            } catch (error) {
+                setError(
+                    error.message ||
+                        "Something went wrong, please try again later!"
+                );
+                setIsLoading(false);
+            }
+        }
     };
 
     const switchAuthModeHandler = () => {
@@ -54,52 +125,69 @@ const Auth = () => {
         setIsLoginMode((prevState) => !prevState);
     };
 
+    const errorHandler = () => {
+        setError(null);
+    };
+
     return (
-        <Card className="auth">
-            <h2 className="auth-header">Sign In</h2>
-            <hr />
-            <form onSubmit={authFormSubmitHandler}>
-                {!isLoginMode && (
-                    <Input
-                        id="name"
-                        element="input"
-                        label="Your Name"
-                        type="text"
-                        validators={[VALIDATOR_REQUIRE()]}
-                        errorText="Please enter your name!"
-                        onInput={inputHandler}
+        <Fragment>
+            {isLoading && <LoadingPulse />}
+            {!isLoading && (
+                <Fragment>
+                    <ErrorModal
+                        error={error}
+                        onClear={errorHandler}
                     />
-                )}
-                <Input
-                    id="email"
-                    element="input"
-                    label="Email"
-                    type="email"
-                    validators={[VALIDATOR_EMAIL()]}
-                    errorText="Please enter a valid email!"
-                    onInput={inputHandler}
-                />
-                <Input
-                    id="password"
-                    element="input"
-                    label="Password"
-                    type="password"
-                    validators={[VALIDATOR_MINLENGTH(8)]}
-                    errorText="Please enter a valid password (min. 8 chars)!"
-                    onInput={inputHandler}
-                />
-                <Button
-                    type="submit"
-                    disabled={!currentFormState.isValid}>
-                    {isLoginMode ? "LOGIN" : "SIGN UP"}
-                </Button>
-            </form>
-            <Button
-                inverse
-                onClick={switchAuthModeHandler}>
-                SWITCH TO {isLoginMode ? "SIGN UP" : "LOGIN"}
-            </Button>
-        </Card>
+                    <Card className="auth">
+                        <Fragment>
+                            <h2 className="auth-header">Sign In</h2>
+                            <hr />
+                            <form onSubmit={authFormSubmitHandler}>
+                                {!isLoginMode && (
+                                    <Input
+                                        id="name"
+                                        element="input"
+                                        label="Your Name"
+                                        type="text"
+                                        validators={[VALIDATOR_REQUIRE()]}
+                                        errorText="Please enter your name!"
+                                        onInput={inputHandler}
+                                    />
+                                )}
+                                <Input
+                                    id="email"
+                                    element="input"
+                                    label="Email"
+                                    type="email"
+                                    validators={[VALIDATOR_EMAIL()]}
+                                    errorText="Please enter a valid email!"
+                                    onInput={inputHandler}
+                                />
+                                <Input
+                                    id="password"
+                                    element="input"
+                                    label="Password"
+                                    type="password"
+                                    validators={[VALIDATOR_MINLENGTH(8)]}
+                                    errorText="Please enter a valid password (min. 8 chars)!"
+                                    onInput={inputHandler}
+                                />
+                                <Button
+                                    type="submit"
+                                    disabled={!currentFormState.isValid}>
+                                    {isLoginMode ? "LOGIN" : "SIGN UP"}
+                                </Button>
+                            </form>
+                            <Button
+                                inverse
+                                onClick={switchAuthModeHandler}>
+                                SWITCH TO {isLoginMode ? "SIGN UP" : "LOGIN"}
+                            </Button>
+                        </Fragment>
+                    </Card>
+                </Fragment>
+            )}
+        </Fragment>
     );
 };
 
