@@ -1,16 +1,16 @@
 const express = require('express');
 const { check } = require("express-validator");
 const {
-    getPlacebyId,
     getPlacesByUserId,
     createPlace,
     updatePlace,
-    deletePlace
+    deletePlace,
+    getPlaceById
 } = require("../controllers/places.controller");
 
 const router = express.Router();
 
-router.get("/:placeId", getPlacebyId);
+router.get("/:placeId", getPlaceById);
 
 router.get("/user/:userId", getPlacesByUserId);
 
