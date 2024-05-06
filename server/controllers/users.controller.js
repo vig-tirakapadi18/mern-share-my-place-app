@@ -67,5 +67,5 @@ exports.loginUser = async (req, res, next) => {
         return next(new HttpError("Invalid credentials, couldn't find the user!", 404));
     }
 
-    res.status(200).json({ success: true, user: existingUser });
+    res.status(200).json({ success: true, user: existingUser.toObject({ getters: true }) });
 };

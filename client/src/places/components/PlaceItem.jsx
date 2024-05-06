@@ -5,24 +5,43 @@ import "./PlaceItem.css";
 import Modal from "../../shared/components/UI/Modal";
 import Map from "../../shared/components/UI/Map";
 import { AuthContext } from "../../shared/context/auth-context";
+import { useHttp } from "../../shared/hooks/http-hook";
+import ErrorModal from "../../shared/components/UI/ErrorModal";
+import LoadingPulse from "../../shared/components/UI/LoadingPulse";
 
 const PlaceItem = (props) => {
     const [showMap, setShowMap] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const authCtx = useContext(AuthContext);
 
+    const { isLoading, error, sendRequest, clearError } = useHttp();
+
     const toggleModalHandler = () => setShowMap((prevState) => !prevState);
 
     const toggleConfirmModalHandler = () =>
         setShowConfirmModal((prevState) => !prevState);
 
-    const confirmDeleteHandler = () => {
+    const confirmDeleteHandler = async () => {
         setShowConfirmModal((prevState) => !prevState);
-        console.log("OKAY WAIT DELETING...");
+
+        try {
+            await sendRequest(
+                `http://localhost:5000/api/places/${props.id}`,
+                "DELETE"
+            );
+
+            props.onDelete(props.id);
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     return (
         <Fragment>
+            <ErrorModal
+                error={error}
+                onClear={clearError}
+            />
             <Modal
                 showModal={showMap}
                 onCancel={toggleModalHandler}
@@ -35,7 +54,7 @@ const PlaceItem = (props) => {
                         center={props.coordinates}
                         zoom={16}
                     />
-                    {/* <h1>This is MAP!</h1> */}
+                    {/* <h1>This isLoading &&  MAP!</h1> */}
                 </div>
             </Modal>
 
@@ -64,38 +83,41 @@ const PlaceItem = (props) => {
                 </p>
             </Modal>
 
-            <li className="place-item">
-                <div className="place-item-image">
-                    <img
-                        src={props.image}
-                        alt={props.title}
-                    />
-                </div>
+            {isLoading && <LoadingPulse />}
+            {!isLoading && (
+                <li className="place-item">
+                    <div className="place-item-image">
+                        <img
+                            src={props.image}
+                            alt={props.title}
+                        />
+                    </div>
 
-                <div className="place-item-info">
-                    <h2>{props.title}</h2>
-                    <h3>{props.address}</h3>
-                    <p>{props.description}</p>
-                </div>
+                    <div className="place-item-info">
+                        <h2>{props.title}</h2>
+                        <h3>{props.address}</h3>
+                        <p>{props.description}</p>
+                    </div>
 
-                <div className="place-item-actions">
-                    <Button
-                        inverse
-                        onClick={toggleModalHandler}>
-                        VIEW ON MAP
-                    </Button>
-                    {authCtx.isLoggedIn && (
-                        <Fragment>
-                            <Button to={`/places/${props.id}`}>EDIT</Button>
-                            <Button
-                                danger
-                                onClick={toggleConfirmModalHandler}>
-                                DELETE
-                            </Button>
-                        </Fragment>
-                    )}
-                </div>
-            </li>
+                    <div className="place-item-actions">
+                        <Button
+                            inverse
+                            onClick={toggleModalHandler}>
+                            VIEW ON MAP
+                        </Button>
+                        {authCtx.userId === props.creatorId && (
+                            <Fragment>
+                                <Button to={`/places/${props.id}`}>EDIT</Button>
+                                <Button
+                                    danger
+                                    onClick={toggleConfirmModalHandler}>
+                                    DELETE
+                                </Button>
+                            </Fragment>
+                        )}
+                    </div>
+                </li>
+            )}
         </Fragment>
     );
 };

@@ -13,6 +13,7 @@ import "./Auth.css";
 import { AuthContext } from "../../shared/context/auth-context";
 import LoadingPulse from "../../shared/components/UI/LoadingPulse";
 import ErrorModal from "../../shared/components/UI/ErrorModal";
+import { useHttp } from "../../shared/hooks/http-hook";
 
 const initialAuthFormState = {
     email: { value: "", isValid: false },
@@ -21,8 +22,9 @@ const initialAuthFormState = {
 
 const Auth = () => {
     const [isLoginMode, setIsLoginMode] = useState(true);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState();
+
+    const { isLoading, error, sendRequest, clearError } = useHttp();
+
     const [currentFormState, inputHandler, setFormData] = useForm(
         initialAuthFormState,
         false
@@ -32,73 +34,43 @@ const Auth = () => {
 
     const authFormSubmitHandler = async (event) => {
         event.preventDefault();
-        setIsLoading(true);
 
         if (isLoginMode) {
             try {
-                const response = await fetch(
+                const responseData = await sendRequest(
                     "http://localhost:5000/api/users/login",
+                    "POST",
+                    JSON.stringify({
+                        email: currentFormState.inputs.email.value,
+                        password: currentFormState.inputs.password.value,
+                    }),
                     {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            email: currentFormState.inputs.email.value,
-                            password: currentFormState.inputs.password.value,
-                        }),
+                        "Content-Type": "application/json",
                     }
                 );
-
-                if (!response.ok) {
-                    throw new Error(responseData.message);
-                }
-
-                const responseData = await response.json();
-                console.log(responseData);
-                setIsLoading(false);
-                authCtx.login();
+                authCtx.login(responseData.user.id);
             } catch (error) {
-                setError(
-                    error.message ||
-                        "Something went wrong, please try again later!"
-                );
-                setIsLoading(false);
+                console.log(error);
             }
         } else {
             try {
-                const response = await fetch(
+                const responseData = await sendRequest(
                     "http://localhost:5000/api/users/sign-up",
+                    "POST",
+                    JSON.stringify({
+                        name: currentFormState.inputs.name.value,
+                        email: currentFormState.inputs.email.value,
+                        password: currentFormState.inputs.password.value,
+                        image: "",
+                        places: [],
+                    }),
                     {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            name: currentFormState.inputs.name.value,
-                            email: currentFormState.inputs.email.value,
-                            password: currentFormState.inputs.password.value,
-                            image: "",
-                            places: [],
-                        }),
+                        "Content-Type": "application/json",
                     }
                 );
-
-                const responseData = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(responseData.message);
-                }
-
-                console.log(responseData);
-                setIsLoading(false);
-                authCtx.login();
+                authCtx.login(responseData.user.id);
             } catch (error) {
-                setError(
-                    error.message ||
-                        "Something went wrong, please try again later!"
-                );
-                setIsLoading(false);
+                console.log(error);
             }
         }
     };
@@ -125,10 +97,6 @@ const Auth = () => {
         setIsLoginMode((prevState) => !prevState);
     };
 
-    const errorHandler = () => {
-        setError(null);
-    };
-
     return (
         <Fragment>
             {isLoading && <LoadingPulse />}
@@ -136,7 +104,7 @@ const Auth = () => {
                 <Fragment>
                     <ErrorModal
                         error={error}
-                        onClear={errorHandler}
+                        onClear={clearError}
                     />
                     <Card className="auth">
                         <Fragment>
