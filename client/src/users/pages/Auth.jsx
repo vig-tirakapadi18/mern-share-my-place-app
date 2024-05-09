@@ -14,6 +14,7 @@ import { AuthContext } from "../../shared/context/auth-context";
 import LoadingPulse from "../../shared/components/UI/LoadingPulse";
 import ErrorModal from "../../shared/components/UI/ErrorModal";
 import { useHttp } from "../../shared/hooks/http-hook";
+import ImageUpload from "../../shared/components/FormElements/ImageUpload";
 
 const initialAuthFormState = {
     email: { value: "", isValid: false },
@@ -48,27 +49,26 @@ const Auth = () => {
                         "Content-Type": "application/json",
                     }
                 );
-                authCtx.login(responseData.user.id);
+                authCtx.login(responseData.userId, responseData.token);
             } catch (error) {
                 console.log(error);
             }
         } else {
             try {
+                const formData = new FormData();
+                formData.append("name", currentFormState.inputs.name.value);
+                formData.append("email", currentFormState.inputs.email.value);
+                formData.append(
+                    "password",
+                    currentFormState.inputs.password.value
+                );
+                formData.append("image", currentFormState.inputs.image.value);
                 const responseData = await sendRequest(
                     "http://localhost:5000/api/users/sign-up",
                     "POST",
-                    JSON.stringify({
-                        name: currentFormState.inputs.name.value,
-                        email: currentFormState.inputs.email.value,
-                        password: currentFormState.inputs.password.value,
-                        image: "",
-                        places: [],
-                    }),
-                    {
-                        "Content-Type": "application/json",
-                    }
+                    formData
                 );
-                authCtx.login(responseData.user.id);
+                authCtx.login(responseData.userId, responseData.token);
             } catch (error) {
                 console.log(error);
             }
@@ -78,7 +78,11 @@ const Auth = () => {
     const switchAuthModeHandler = () => {
         if (!isLoginMode) {
             setFormData(
-                { ...currentFormState.inputs, name: undefined },
+                {
+                    ...currentFormState.inputs,
+                    name: undefined,
+                    image: undefined,
+                },
                 currentFormState.inputs.email.isValid &&
                     currentFormState.inputs.password.isValid
             );
@@ -88,6 +92,10 @@ const Auth = () => {
                     ...currentFormState.inputs,
                     name: {
                         value: "",
+                        isValid: false,
+                    },
+                    image: {
+                        value: null,
                         isValid: false,
                     },
                 },
@@ -120,6 +128,14 @@ const Auth = () => {
                                         validators={[VALIDATOR_REQUIRE()]}
                                         errorText="Please enter your name!"
                                         onInput={inputHandler}
+                                    />
+                                )}
+                                {!isLoginMode && (
+                                    <ImageUpload
+                                        id="image"
+                                        center
+                                        onInput={inputHandler}
+                                        errorText="Please provide an image."
                                     />
                                 )}
                                 <Input

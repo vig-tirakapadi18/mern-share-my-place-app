@@ -27,7 +27,11 @@ const PlaceItem = (props) => {
         try {
             await sendRequest(
                 `http://localhost:5000/api/places/${props.id}`,
-                "DELETE"
+                "DELETE",
+                null,
+                {
+                    Authorization: `Bearer ${authCtx.token}`,
+                }
             );
 
             props.onDelete(props.id);
@@ -88,7 +92,7 @@ const PlaceItem = (props) => {
                 <li className="place-item">
                     <div className="place-item-image">
                         <img
-                            src={props.image}
+                            src={`http://localhost:5000/${props.image}`}
                             alt={props.title}
                         />
                     </div>

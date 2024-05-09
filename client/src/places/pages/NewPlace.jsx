@@ -12,6 +12,7 @@ import { AuthContext } from "../../shared/context/auth-context";
 import ErrorModal from "../../shared/components/UI/ErrorModal";
 import LoadingPulse from "../../shared/components/UI/LoadingPulse";
 import { useNavigate } from "react-router-dom";
+import ImageUpload from "../../shared/components/FormElements/ImageUpload";
 
 const initialFormInputs = {
     title: {
@@ -24,6 +25,10 @@ const initialFormInputs = {
     },
     address: {
         value: "",
+        isValid: false,
+    },
+    image: {
+        value: null,
         isValid: false,
     },
 };
@@ -39,17 +44,22 @@ const NewPlace = () => {
         event.preventDefault();
 
         try {
+            const formData = new FormData();
+            formData.append("title", currentFormState.inputs.title.value);
+            formData.append(
+                "description",
+                currentFormState.inputs.description.value
+            );
+            formData.append("address", currentFormState.inputs.address.value);
+            formData.append("creator", authCtx.userId);
+            formData.append("image", currentFormState.inputs.image.value);
+
             await sendRequest(
                 "http://localhost:5000/api/places",
                 "POST",
-                JSON.stringify({
-                    title: currentFormState.inputs.title.value,
-                    description: currentFormState.inputs.description.value,
-                    address: currentFormState.inputs.address.value,
-                    creator: authCtx.userId,
-                }),
+                formData,
                 {
-                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authCtx.token}`,
                 }
             );
             navigate("/");
@@ -93,6 +103,12 @@ const NewPlace = () => {
                         validators={[VALIDATOR_REQUIRE()]}
                         errorText="Please enter a valid Address!"
                         onInput={inputHandler}
+                    />
+
+                    <ImageUpload
+                        id="image"
+                        onInput={inputHandler}
+                        errorText="Please provide an image."
                     />
 
                     <Button

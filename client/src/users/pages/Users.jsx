@@ -17,8 +17,6 @@ const Users = () => {
                 );
 
                 setUsers(responseData.users);
-
-                console.log(responseData);
             } catch (error) {
                 console.log(error);
             }

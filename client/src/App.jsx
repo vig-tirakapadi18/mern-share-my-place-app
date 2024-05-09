@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useState } from "react";
+import { Fragment } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Users from "./users/pages/Users";
 import NewPlace from "./places/pages/NewPlace";
@@ -7,24 +7,14 @@ import UserPlaces from "./places/pages/UserPlaces";
 import UpdatePlace from "./places/pages/UpdatePlace";
 import Auth from "./users/pages/Auth";
 import { AuthContext } from "./shared/context/auth-context";
+import { useAuth } from "./shared/hooks/auth-hook";
 
 const App = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userId, setUserId] = useState(null);
-
-    const login = useCallback((uId) => {
-        setIsLoggedIn(true);
-        setUserId(uId);
-    }, []);
-
-    const logout = useCallback(() => {
-        setIsLoggedIn(false);
-        setUserId(null);
-    }, []);
+    const { login, logout, userId, token } = useAuth();
 
     let routes;
 
-    if (isLoggedIn) {
+    if (token) {
         routes = (
             <Routes>
                 <Route
@@ -77,7 +67,8 @@ const App = () => {
     }
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, userId, login, logout }}>
+        <AuthContext.Provider
+            value={{ isLoggedIn: !!token, token, userId, login, logout }}>
             <Fragment>
                 <MainNavigation />
 
