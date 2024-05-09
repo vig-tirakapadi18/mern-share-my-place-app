@@ -1,13 +1,21 @@
-import { Fragment } from "react";
+import { Fragment, Suspense, lazy } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import Users from "./users/pages/Users";
-import NewPlace from "./places/pages/NewPlace";
+// import Users from "./users/pages/Users";
+// import NewPlace from "./places/pages/NewPlace";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
-import UserPlaces from "./places/pages/UserPlaces";
-import UpdatePlace from "./places/pages/UpdatePlace";
-import Auth from "./users/pages/Auth";
+// import UserPlaces from "./places/pages/UserPlaces";
+// import UpdatePlace from "./places/pages/UpdatePlace";
+// import Auth from "./users/pages/Auth";
 import { AuthContext } from "./shared/context/auth-context";
 import { useAuth } from "./shared/hooks/auth-hook";
+import LoadingPulse from "./shared/components/UI/LoadingPulse";
+
+// LAZY LOADING
+const Users = lazy(() => import("./users/pages/Users"));
+const NewPlace = lazy(() => import("./places/pages/NewPlace"));
+const UserPlaces = lazy(() => import("./places/pages/UserPlaces"));
+const UpdatePlace = lazy(() => import("./users/pages/Auth"));
+const Auth = lazy(() => import("./places/pages/NewPlace"));
 
 const App = () => {
     const { login, logout, userId, token } = useAuth();
@@ -72,7 +80,9 @@ const App = () => {
             <Fragment>
                 <MainNavigation />
 
-                <main>{routes}</main>
+                <main>
+                    <Suspense fallback={<LoadingPulse />}>{routes}</Suspense>
+                </main>
             </Fragment>
         </AuthContext.Provider>
     );
