@@ -14,8 +14,8 @@ import LoadingPulse from "./shared/components/UI/LoadingPulse";
 const Users = lazy(() => import("./users/pages/Users"));
 const NewPlace = lazy(() => import("./places/pages/NewPlace"));
 const UserPlaces = lazy(() => import("./places/pages/UserPlaces"));
-const UpdatePlace = lazy(() => import("./users/pages/Auth"));
-const Auth = lazy(() => import("./places/pages/NewPlace"));
+const UpdatePlace = lazy(() => import("./places/pages/UpdatePlace"));
+const Auth = lazy(() => import("./users/pages/Auth"));
 
 const App = () => {
     const { login, logout, userId, token } = useAuth();
