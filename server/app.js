@@ -33,10 +33,10 @@ app.use("/api/places", placesRoutes);
 
 app.use("/api/users", usersRoutes);
 
-app.use(express.static(path.join(__dirname, "/client/dist")));
-app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
-})
+// app.use(express.static(path.join(__dirname, "/client/dist")));
+// app.get("*", (req, res) => {
+//     res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
+// })
 
 app.use((req, res, next) => {
     return next(new HttpError("404: Page Not Found!", 404));
