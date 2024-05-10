@@ -43,12 +43,12 @@ app.use("/api/users", usersRoutes);
 //     });
 // }
 
-console.log(path.join(dirName, "/client/dist"));
-console.log(path.join(dirName, "/client/dist/index.html"));
+console.log(path.join(process.cwd(), "/client/dist"));
+console.log(path.join(process.cwd(), "/client/dist/index.html"));
 
-app.use(express.static(path.join(dirName, "/client/dist")));
+app.use(express.static(path.join(process.cwd(), "/client/dist")));
 app.get("*", (req, res) => {
-    res.sendFile(path.join(dirName, "client", "dist", "index.html"));
+    res.sendFile(path.join(process.cwd(), "client", "dist", "index.html"));
 })
 
 app.use((req, res, next) => {
