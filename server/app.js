@@ -42,9 +42,9 @@ app.use("/api/users", usersRoutes);
 //     });
 // }
 
-app.use((req, res, next) => {
-    return next(new HttpError("404: Page Not Found!", 404));
-});
+// app.use((req, res, next) => {
+//     return next(new HttpError("404: Page Not Found!", 404));
+// });
 
 app.use(express.static(path.join(dirName, "/client/dist")));
 
