@@ -10,6 +10,9 @@ const HttpError = require("./models/http-error");
 
 const app = express();
 
+const dirName = path.resolve("../");
+console.log(dirName);
+
 dotenv.config();
 
 app.use(express.json());
@@ -34,11 +37,14 @@ app.use("/api/places", placesRoutes);
 app.use("/api/users", usersRoutes);
 
 if (process.env.NODE_ENV === "production") {
-    app.use("/", express.static(path.join(__dirname, "client", "dist")));
+    app.use("/", express.static(path.join(dirName, "/client/dist")));
     app.get("*", (req, res) => {
-        res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
+        res.sendFile(path.join(dirName, "/client/dist/index.html"));
     });
 }
+
+console.log(path.join(dirName, "/client/dist"));
+console.log(path.join(dirName, "/client/dist/index.html"));
 
 // app.use(express.static(path.join(__dirname, "/client/dist")));
 // app.get("*", (req, res) => {
