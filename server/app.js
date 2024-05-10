@@ -10,8 +10,7 @@ const HttpError = require("./models/http-error");
 
 const app = express();
 
-const dirName = path.resolve("../");
-console.log(dirName);
+const dirName = path.resolve();
 
 dotenv.config();
 
@@ -20,16 +19,16 @@ app.use(express.json());
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
 
 // ALLOWING CORS OPTIONS 
-app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    );
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
+// app.use((req, res, next) => {
+//     res.setHeader("Access-Control-Allow-Origin", "*");
+//     res.setHeader(
+//         "Access-Control-Allow-Headers",
+//         "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+//     );
+//     res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
 
-    next();
-});
+//     next();
+// });
 
 
 app.use("/api/places", placesRoutes);
@@ -43,17 +42,15 @@ app.use("/api/users", usersRoutes);
 //     });
 // }
 
-console.log((path.join(process.cwd(), "/client/dist")));
-console.log(path.join(path.join(process.cwd(), "client", "dist", "index.html")));
-
-app.use(express.static(path.join(process.cwd(), "/client/dist")));
-app.get("*", (req, res) => {
-    res.sendFile(path.join(process.cwd(), "client", "dist", "index.html"));
-})
-
 app.use((req, res, next) => {
     return next(new HttpError("404: Page Not Found!", 404));
 });
+
+app.use(express.static(path.join(dirName, "/client/dist")));
+
+app.get("*", (req, res) => {
+    res.sendFile(path.join(dirName, "client", "dist", "index.html"));
+})
 
 app.use((error, req, res, next) => {
     if (req.file) {
