@@ -36,20 +36,20 @@ app.use("/api/places", placesRoutes);
 
 app.use("/api/users", usersRoutes);
 
-if (process.env.NODE_ENV === "production") {
-    app.use("/", express.static(path.join(dirName, "/client/dist")));
-    app.get("*", (req, res) => {
-        res.sendFile(path.join(dirName, "/client/dist/index.html"));
-    });
-}
+// if (process.env.NODE_ENV === "production") {
+//     app.use("/", express.static(path.join(dirName, "/client/dist")));
+//     app.get("*", (req, res) => {
+//         res.sendFile(path.join(dirName, "/client/dist/index.html"));
+//     });
+// }
 
 console.log(path.join(dirName, "/client/dist"));
 console.log(path.join(dirName, "/client/dist/index.html"));
 
-// app.use(express.static(path.join(__dirname, "/client/dist")));
-// app.get("*", (req, res) => {
-//     res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
-// })
+app.use(express.static(path.join(dirName, "/client/dist")));
+app.get("*", (req, res) => {
+    res.sendFile(path.join(dirName, "client", "dist", "index.html"));
+})
 
 app.use((req, res, next) => {
     return next(new HttpError("404: Page Not Found!", 404));
