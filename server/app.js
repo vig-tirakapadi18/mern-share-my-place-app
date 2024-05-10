@@ -58,7 +58,7 @@ app.use((error, req, res, next) => {
 mongoose.connect(process.env.CONN_STR)
     .then(() => {
         console.log("Connection established with MongoDB!")
-        app.listen(5000, () => {
+        app.listen(process.env.PORT, () => {
             console.log("Server listening on port 5000!");
         })
     })
