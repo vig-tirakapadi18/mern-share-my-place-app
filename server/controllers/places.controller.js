@@ -49,7 +49,7 @@ exports.createPlace = async (req, res, next) => {
         return next(new HttpError("Invalid inputs, please provide a valid inputs!", 422));
     }
 
-    const { title, description, address, creator } = req.body;
+    const { title, description, address, creator, image } = req.body;
 
     let coordinates = getCoordinatesForAddress(address);
 
@@ -58,7 +58,7 @@ exports.createPlace = async (req, res, next) => {
         description,
         address,
         location: coordinates,
-        image: req.file.path,
+        image,
         creator: req.userData.userId
     });
 

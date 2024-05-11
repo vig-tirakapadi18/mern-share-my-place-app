@@ -92,7 +92,7 @@ const PlaceItem = (props) => {
                 <li className="place-item">
                     <div className="place-item-image">
                         <img
-                            src={`http://localhost:5000/${props.image}`}
+                            src={props.image}
                             alt={props.title}
                         />
                     </div>
