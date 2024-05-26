@@ -1,15 +1,23 @@
+import styledComponent from "styled-components";
+
 import loadingPulse from "../../../assets/pulse.svg";
-import "./LoadingPulse.css";
 
 const LoadingPulse = () => {
-    return (
-        <div className="loader">
-            <img
-                src={loadingPulse}
-                alt="loading..."
-            />
-        </div>
-    );
+  return (
+    <LoaderWrapper>
+      <img
+        src={loadingPulse}
+        alt="loading..."
+      />
+    </LoaderWrapper>
+  );
 };
 
 export default LoadingPulse;
+
+const LoaderWrapper = styledComponent.div`
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+`;

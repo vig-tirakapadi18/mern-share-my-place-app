@@ -1,18 +1,13 @@
-.auth-header {
-    color: white;
-    text-align: center;
-}
-
 .auth {
-    width: 90%;
-    max-width: 30rem;
-    margin: 7rem auto;
-    background-color: rgba(0, 0, 0, 0.85);
-    padding: 1rem;
-    border-radius: 6px;
-    box-shadow: 0 10px 20px 5px rgba(0, 0, 0, 0.35);
+  width: 90%;
+  max-width: 30rem;
+  margin: 7rem auto;
+  background-color: rgba(0, 0, 0, 0.85);
+  padding: 1rem;
+  border-radius: 6px;
+  box-shadow: 0 10px 20px 5px rgba(0, 0, 0, 0.35);
 }
 
 .auth form {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
